@@ -1,0 +1,18 @@
+{
+  "name": "newscred-rag",
+  "version": "1.0.0",
+  "description": "News verification app with source credential scoring, RAG evidence retrieval, verdicts, tests, and documentation.",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "test": "node --test tests/*.test.js"
+  },
+  "keywords": [
+    "news",
+    "fact-checking",
+    "rag",
+    "verification",
+    "journalism"
+  ],
+  "license": "UNLICENSED"
+}

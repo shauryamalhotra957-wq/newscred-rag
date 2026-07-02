@@ -1,0 +1,157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>NewsCred RAG</title>
+    <link rel="stylesheet" href="/styles.css?v=20260702" />
+  </head>
+  <body>
+    <header class="topbar">
+      <a class="brand" href="/" aria-label="NewsCred RAG home">
+        <span class="brand-mark">NC</span>
+        <span>NewsCred RAG</span>
+      </a>
+      <nav aria-label="Primary">
+        <a href="#verify">Verify</a>
+        <a href="#evidence">Evidence</a>
+        <a href="#method">Method</a>
+      </nav>
+    </header>
+
+    <main>
+      <section class="workspace" id="verify">
+        <div class="intro">
+          <p class="eyebrow">Source credentials + claim evidence</p>
+          <h1>Verify news before it spreads.</h1>
+          <p class="lede">
+            Paste a story, URL, byline, and date. The app extracts claims, checks source credentials, retrieves relevant evidence with RAG, and returns an explainable verdict.
+          </p>
+        </div>
+
+        <form class="verify-panel" id="verifyForm">
+          <div class="panel-head">
+            <div>
+              <p class="kicker">Article intake</p>
+              <h2>Credential check</h2>
+            </div>
+            <span class="status-pill" id="apiStatus">Connecting</span>
+          </div>
+
+          <label>
+            <span>Headline</span>
+            <input id="title" name="title" maxlength="220" value="Viral post claims unnamed pill cures all cancers overnight" />
+          </label>
+          <div class="input-grid">
+            <label>
+              <span>Source URL</span>
+              <input id="sourceUrl" name="sourceUrl" maxlength="500" value="https://exampleviralnews.test/story" />
+            </label>
+            <label>
+              <span>Author/byline</span>
+              <input id="author" name="author" maxlength="120" placeholder="Reporter or institution" />
+            </label>
+            <label>
+              <span>Published date</span>
+              <input id="publishedAt" name="publishedAt" maxlength="80" placeholder="2026-07-02" />
+            </label>
+          </div>
+          <label>
+            <span>Article text</span>
+            <textarea id="body" name="body">A viral post claims doctors are hiding an unnamed pill that cures all cancers overnight. It provides no study, no trial, no institution, no named doctor, and asks readers to share before it is deleted.</textarea>
+          </label>
+          <div class="actions">
+            <button class="primary" type="submit" title="Verify article">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12l2 2 4-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
+              Verify story
+            </button>
+            <button class="secondary" type="button" id="loadCredible" title="Load credible sample">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h8M8 16h5" /></svg>
+              Credible sample
+            </button>
+            <button class="secondary" type="button" id="loadRisky" title="Load risky sample">
+              <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 9v4m0 4h.01M10.3 4.3 2.5 18a2 2 0 0 0 1.7 3h15.6a2 2 0 0 0 1.7-3L13.7 4.3a2 2 0 0 0-3.4 0Z" /></svg>
+              Risky sample
+            </button>
+          </div>
+        </form>
+      </section>
+
+      <section class="results" aria-live="polite">
+        <div class="section-head">
+          <p class="kicker">Verification output</p>
+          <h2 id="resultTitle">Run a story to see a verdict.</h2>
+        </div>
+        <div class="result-grid">
+          <article class="score-card" id="scoreCard">
+            <div class="score-ring" id="scoreRing">--</div>
+            <div>
+              <p class="kicker">Verdict</p>
+              <h3 id="verdictLabel">Waiting for article</h3>
+              <p id="verdictNote">The system will show claim extraction, source credential scoring, retrieved evidence, and warnings.</p>
+            </div>
+          </article>
+          <article class="panel">
+            <p class="kicker">Source credentials</p>
+            <div id="credentialBody" class="empty">No source checked yet.</div>
+          </article>
+        </div>
+        <div class="analysis-grid">
+          <article class="panel">
+            <p class="kicker">Extracted claims</p>
+            <div id="claimsBody" class="empty">Claims will appear here.</div>
+          </article>
+          <article class="panel" id="evidence">
+            <p class="kicker">Retrieved evidence</p>
+            <div id="evidenceBody" class="empty">RAG evidence will appear here.</div>
+          </article>
+          <article class="panel">
+            <p class="kicker">Warnings and strengths</p>
+            <div id="signalsBody" class="empty">Signals will appear here.</div>
+          </article>
+        </div>
+      </section>
+
+      <section class="method" id="method">
+        <div class="section-head">
+          <p class="kicker">How RAG works here</p>
+          <h2>Retrieval makes the verdict inspectable.</h2>
+        </div>
+        <div class="method-grid">
+          <article>
+            <span>01</span>
+            <h3>Normalize intake</h3>
+            <p>The app sanitizes title, URL, author, date, and body. Prompt-injection phrases are stripped because user text is evidence input, not system instruction.</p>
+          </article>
+          <article>
+            <span>02</span>
+            <h3>Extract claims</h3>
+            <p>Sentences with claim verbs, reported speech, study language, or event language become checkable claims instead of labeling the whole article at once.</p>
+          </article>
+          <article>
+            <span>03</span>
+            <h3>Retrieve evidence</h3>
+            <p>Claims and article text are tokenized and compared with curated evidence documents by cosine similarity, topic hits, and source credibility boosts.</p>
+          </article>
+          <article>
+            <span>04</span>
+            <h3>Score credentials</h3>
+            <p>The source domain is matched against a registry, then adjusted for HTTPS, byline, publication date, citation language, and risk flags.</p>
+          </article>
+          <article>
+            <span>05</span>
+            <h3>Explain verdict</h3>
+            <p>The final score blends source credentials, retrieved evidence, claim support ratio, risk penalties, and evidence markers. Every component is returned to the UI.</p>
+          </article>
+          <article>
+            <span>06</span>
+            <h3>Human-safe output</h3>
+            <p>The prototype does not declare universal truth. It shows confidence, evidence, gaps, and warnings so people can decide what needs review before publishing.</p>
+          </article>
+        </div>
+      </section>
+    </main>
+
+    <script src="/app.js?v=20260702" defer></script>
+  </body>
+</html>

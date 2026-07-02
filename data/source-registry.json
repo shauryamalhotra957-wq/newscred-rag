@@ -1,0 +1,58 @@
+[
+  {
+    "domain": "who.int",
+    "name": "World Health Organization",
+    "type": "primary-institution",
+    "credentialScore": 96,
+    "strengths": ["global health authority", "primary guidance", "transparent publications"],
+    "riskFlags": []
+  },
+  {
+    "domain": "cdc.gov",
+    "name": "Centers for Disease Control and Prevention",
+    "type": "primary-institution",
+    "credentialScore": 94,
+    "strengths": ["public health authority", "primary data", "methodology notes"],
+    "riskFlags": []
+  },
+  {
+    "domain": "bls.gov",
+    "name": "U.S. Bureau of Labor Statistics",
+    "type": "primary-data",
+    "credentialScore": 95,
+    "strengths": ["official labor data", "release calendar", "methodology documentation"],
+    "riskFlags": []
+  },
+  {
+    "domain": "sec.gov",
+    "name": "U.S. Securities and Exchange Commission",
+    "type": "primary-regulator",
+    "credentialScore": 95,
+    "strengths": ["official filings", "issuer documents", "regulatory source"],
+    "riskFlags": []
+  },
+  {
+    "domain": "reuters.com",
+    "name": "Reuters",
+    "type": "newswire",
+    "credentialScore": 88,
+    "strengths": ["wire service", "corrections policy", "named reporters"],
+    "riskFlags": []
+  },
+  {
+    "domain": "apnews.com",
+    "name": "Associated Press",
+    "type": "newswire",
+    "credentialScore": 88,
+    "strengths": ["wire service", "standards desk", "corrections policy"],
+    "riskFlags": []
+  },
+  {
+    "domain": "exampleviralnews.test",
+    "name": "Example Viral News",
+    "type": "unverified",
+    "credentialScore": 22,
+    "strengths": [],
+    "riskFlags": ["unknown ownership", "no corrections policy", "unverified domain"]
+  }
+]

@@ -1,0 +1,115 @@
+[
+  {
+    "id": "method-ifcn-transparency",
+    "title": "Fact-checking transparency principles",
+    "source": "International Fact-Checking Network",
+    "sourceUrl": "https://www.poynter.org/ifcn/",
+    "publishedAt": "2026-01-01",
+    "topics": ["methodology", "fact checking", "corrections", "transparency", "sources"],
+    "credibility": 92,
+    "summary": "Reliable fact-checking explains sources, methodology, funding, corrections, and why a claim received a rating.",
+    "claims": [
+      "A verification system should disclose its evidence and method.",
+      "Fact checks should be transparent about sources and corrections."
+    ]
+  },
+  {
+    "id": "schema-claimreview",
+    "title": "ClaimReview structured data",
+    "source": "Schema.org",
+    "sourceUrl": "https://schema.org/ClaimReview",
+    "publishedAt": "2026-01-01",
+    "topics": ["claimreview", "structured data", "fact check", "rating"],
+    "credibility": 90,
+    "summary": "ClaimReview provides a structured way to represent a reviewed claim, its author, the item reviewed, and the review rating.",
+    "claims": [
+      "A fact-check record should preserve the claim, author, review body, and review rating.",
+      "Claim-level verification is more auditable than article-level labels alone."
+    ]
+  },
+  {
+    "id": "google-fact-check-api",
+    "title": "Fact Check Tools API",
+    "source": "Google Developers",
+    "sourceUrl": "https://developers.google.com/fact-check/tools/api",
+    "publishedAt": "2026-01-01",
+    "topics": ["fact check api", "claim search", "external verification", "claimreview"],
+    "credibility": 88,
+    "summary": "The Fact Check Tools API lets applications search fact-check articles and ClaimReview markup from fact-checking publishers.",
+    "claims": [
+      "External fact-check APIs can supplement local retrieval.",
+      "ClaimReview-compatible results help compare a submitted claim with existing fact checks."
+    ]
+  },
+  {
+    "id": "w3c-verifiable-credentials",
+    "title": "Verifiable credentials data model",
+    "source": "W3C",
+    "sourceUrl": "https://www.w3.org/TR/vc-data-model-2.0/",
+    "publishedAt": "2026-01-01",
+    "topics": ["credentials", "identity", "issuer", "verification", "trust"],
+    "credibility": 94,
+    "summary": "Verifiable credentials describe tamper-evident claims about subjects, issuers, and proofs that can support source identity checks.",
+    "claims": [
+      "Credential verification should identify issuer, subject, proof, and status.",
+      "Source credentials are separate from whether a specific claim is true."
+    ]
+  },
+  {
+    "id": "c2pa-provenance",
+    "title": "C2PA content provenance",
+    "source": "Coalition for Content Provenance and Authenticity",
+    "sourceUrl": "https://spec.c2pa.org/specifications/specifications/2.2/index.html",
+    "publishedAt": "2026-01-01",
+    "topics": ["media provenance", "image verification", "content authenticity", "c2pa"],
+    "credibility": 90,
+    "summary": "C2PA manifests can attach provenance assertions to media, helping users inspect origin and editing history.",
+    "claims": [
+      "Media provenance signals help evaluate photos and videos attached to news.",
+      "Absence of provenance is not proof that media is false."
+    ]
+  },
+  {
+    "id": "health-misinfo-checks",
+    "title": "Health claim verification baseline",
+    "source": "NewsCred demo corpus",
+    "sourceUrl": "local://demo/health",
+    "publishedAt": "2026-01-01",
+    "topics": ["health", "medicine", "clinical trials", "public health", "evidence", "cancer", "cure", "pill"],
+    "credibility": 82,
+    "summary": "High-risk health news should be checked against primary institutions, clinical evidence, exact dates, named experts, and conflicts of interest.",
+    "claims": [
+      "A health cure claim, including a cancer cure claim, needs strong clinical evidence before it can be treated as verified.",
+      "Claims about unnamed pills curing cancer overnight are high risk without named trials and institutions.",
+      "Anonymous viral posts are weak evidence for medical claims."
+    ]
+  },
+  {
+    "id": "financial-news-checks",
+    "title": "Financial and market claim verification baseline",
+    "source": "NewsCred demo corpus",
+    "sourceUrl": "local://demo/finance",
+    "publishedAt": "2026-01-01",
+    "topics": ["finance", "markets", "sec filings", "company statements", "earnings"],
+    "credibility": 82,
+    "summary": "Market-moving claims require primary filings, company statements, exchange notices, or credible wire confirmation before publication.",
+    "claims": [
+      "A company acquisition rumor is not verified without filings, company statements, or multiple high-credibility reports.",
+      "Market news needs timestamps because stale reports can be misleading."
+    ]
+  },
+  {
+    "id": "disaster-breaking-news",
+    "title": "Breaking disaster verification baseline",
+    "source": "NewsCred demo corpus",
+    "sourceUrl": "local://demo/disaster",
+    "publishedAt": "2026-01-01",
+    "topics": ["breaking news", "disaster", "official statements", "location", "timestamp"],
+    "credibility": 82,
+    "summary": "Breaking disaster reporting should separate confirmed official facts from unverified witness accounts and old media recirculation.",
+    "claims": [
+      "Breaking news should preserve uncertainty when only one source is available.",
+      "Images and videos need timestamp, location, and provenance checks."
+    ]
+  }
+]

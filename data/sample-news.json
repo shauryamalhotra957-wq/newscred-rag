@@ -1,0 +1,16 @@
+[
+  {
+    "title": "Local hospital says new trial reduced flu complications",
+    "sourceUrl": "https://who.int/news-room/example",
+    "author": "Dr. A. Reporter",
+    "publishedAt": "2026-07-01",
+    "body": "A regional hospital announced that a peer-reviewed clinical trial reduced flu complications among high-risk adults. The statement cites trial size, endpoints, and public health guidance. Officials said the treatment is not a miracle cure and should be used with existing vaccination guidance."
+  },
+  {
+    "title": "Viral post claims unnamed pill cures all cancers overnight",
+    "sourceUrl": "https://exampleviralnews.test/story",
+    "author": "",
+    "publishedAt": "",
+    "body": "A viral post claims doctors are hiding an unnamed pill that cures all cancers overnight. It provides no study, no trial, no institution, no named doctor, and asks readers to share before it is deleted."
+  }
+]
