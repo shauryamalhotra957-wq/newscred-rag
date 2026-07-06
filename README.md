@@ -8,6 +8,14 @@ NewsCred RAG is a working prototype for news verification. It checks source cred
 
 News verification should be explainable. This project does not simply label an article as true or false; it shows the signals behind the assessment: source strength, claim coverage, retrieved evidence, confidence, and gaps that need human review.
 
+## Validate
+
+```powershell
+npm.cmd run validate
+```
+
+`npm.cmd run validate` is the pre-commit check for this dependency-free prototype. It currently runs the full Node test suite.
+
 ## What It Does
 
 - Accepts headline, source URL, author/byline, publication date, and article body.
