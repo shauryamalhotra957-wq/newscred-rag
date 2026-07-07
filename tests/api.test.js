@@ -31,6 +31,19 @@ test("API blocks missing CSRF and verifies with valid CSRF", async () => {
     });
     assert.equal(blocked.status, 403);
 
+    const crossOriginBlocked = await fetch(`${base}/api/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": session.csrfToken,
+        Cookie: cookie,
+        Origin: "https://malicious.example"
+      },
+      body: JSON.stringify({ article: {} })
+    });
+    assert.equal(crossOriginBlocked.status, 403);
+    assert.equal((await crossOriginBlocked.json()).error, "bad_origin");
+
     const verified = await fetch(`${base}/api/verify`, {
       method: "POST",
       headers: {
