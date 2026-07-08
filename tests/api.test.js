@@ -2,6 +2,7 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const path = require("node:path");
 const { createServer, safeStaticPath } = require("../server");
 
 function listen(server) {
@@ -11,7 +12,9 @@ function listen(server) {
 }
 
 test("safeStaticPath blocks traversal", () => {
-  assert.equal(safeStaticPath(process.cwd(), "/../../secret.txt"), null);
+  const publicDir = path.join(process.cwd(), "public");
+  assert.equal(safeStaticPath(publicDir, "/../../secret.txt"), null);
+  assert.equal(safeStaticPath(publicDir, "/../publicity/secret.txt"), null);
 });
 
 test("API blocks missing CSRF and verifies with valid CSRF", async () => {
