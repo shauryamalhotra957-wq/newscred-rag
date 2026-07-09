@@ -73,3 +73,38 @@ test("API blocks missing CSRF and verifies with valid CSRF", async () => {
     server.close();
   }
 });
+
+test("live news endpoint normalizes feed stories and returns verifier output", async () => {
+  const server = createServer({
+    newsFeeds: [
+      {
+        id: "test-wire",
+        name: "Reuters",
+        region: "Global",
+        url: "https://feeds.example.test/reuters.xml"
+      }
+    ],
+    fetchText: async () => `
+      <rss><channel><item>
+        <title>Official report says climate data rose</title>
+        <link>https://reuters.com/world/climate-report</link>
+        <description>According to official data, researchers reported a measurable increase.</description>
+        <pubDate>Thu, 09 Jul 2026 08:30:00 GMT</pubDate>
+        <dc:creator>Reuters Staff</dc:creator>
+      </item></channel></rss>
+    `
+  });
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/live-news`);
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.equal(payload.items.length, 1);
+    assert.equal(payload.items[0].source, "Reuters");
+    assert.equal(payload.items[0].title, "Official report says climate data rose");
+    assert.equal(payload.items[0].verification.credentials.sourceName, "Reuters");
+    assert.ok(payload.items[0].verification.score > 0);
+  } finally {
+    server.close();
+  }
+});

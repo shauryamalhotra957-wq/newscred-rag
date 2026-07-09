@@ -48,6 +48,70 @@
     "riskFlags": []
   },
   {
+    "domain": "bbc.com",
+    "name": "BBC News",
+    "type": "public-service-news",
+    "credentialScore": 84,
+    "strengths": ["public-service newsroom", "global bureau network", "corrections policy"],
+    "riskFlags": []
+  },
+  {
+    "domain": "bbc.co.uk",
+    "name": "BBC News",
+    "type": "public-service-news",
+    "credentialScore": 84,
+    "strengths": ["public-service newsroom", "global bureau network", "corrections policy"],
+    "riskFlags": []
+  },
+  {
+    "domain": "aljazeera.com",
+    "name": "Al Jazeera",
+    "type": "international-newsroom",
+    "credentialScore": 80,
+    "strengths": ["international newsroom", "named reporting", "regional coverage depth"],
+    "riskFlags": []
+  },
+  {
+    "domain": "theguardian.com",
+    "name": "The Guardian",
+    "type": "newsroom",
+    "credentialScore": 82,
+    "strengths": ["established newsroom", "named reporting", "corrections policy"],
+    "riskFlags": []
+  },
+  {
+    "domain": "npr.org",
+    "name": "NPR",
+    "type": "public-radio-news",
+    "credentialScore": 83,
+    "strengths": ["public media newsroom", "named reporting", "editorial standards"],
+    "riskFlags": []
+  },
+  {
+    "domain": "france24.com",
+    "name": "France 24",
+    "type": "international-newsroom",
+    "credentialScore": 80,
+    "strengths": ["international newsroom", "multilingual reporting", "editorial standards"],
+    "riskFlags": []
+  },
+  {
+    "domain": "dw.com",
+    "name": "Deutsche Welle",
+    "type": "public-service-news",
+    "credentialScore": 80,
+    "strengths": ["public-service broadcaster", "international reporting", "editorial standards"],
+    "riskFlags": []
+  },
+  {
+    "domain": "abc.net.au",
+    "name": "ABC News Australia",
+    "type": "public-service-news",
+    "credentialScore": 82,
+    "strengths": ["public-service newsroom", "regional reporting", "editorial standards"],
+    "riskFlags": []
+  },
+  {
     "domain": "exampleviralnews.test",
     "name": "Example Viral News",
     "type": "unverified",

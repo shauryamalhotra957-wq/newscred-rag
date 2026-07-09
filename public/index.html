@@ -13,6 +13,7 @@
         <span>NewsCred RAG</span>
       </a>
       <nav aria-label="Primary">
+        <a href="#live">Live</a>
         <a href="#verify">Verify</a>
         <a href="#evidence">Evidence</a>
         <a href="#method">Method</a>
@@ -75,6 +76,23 @@
             </button>
           </div>
         </form>
+      </section>
+
+      <section class="live-news" id="live">
+        <div class="section-head">
+          <div>
+            <p class="kicker">Live global headlines</p>
+            <h2>Pick a real story and run the same verifier.</h2>
+          </div>
+          <button class="secondary" type="button" id="refreshNews" title="Refresh live headlines">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.4 6.4M3 12A9 9 0 0 1 18.4 5.6M21 5v7h-7M3 19v-7h7" /></svg>
+            Refresh
+          </button>
+        </div>
+        <p class="live-note" id="liveStatus">
+          Loading public RSS headlines from global newsrooms. Each card includes a source credibility preview and can be fact-checked with the local RAG verifier.
+        </p>
+        <div class="live-grid" id="liveNewsBody" aria-live="polite"></div>
       </section>
 
       <section class="results" aria-live="polite">

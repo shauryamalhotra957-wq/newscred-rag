@@ -5,6 +5,7 @@ const http = require("http");
 const path = require("path");
 const { URL } = require("url");
 
+const { fetchGlobalNews } = require("./lib/liveNews");
 const { verifyArticle } = require("./lib/verifier");
 const { cleanup, enforceRateLimit, getSession, readBody, requireCsrf, setHeaders, writeJson } = require("./lib/security");
 
@@ -54,6 +55,8 @@ function createServer(options = {}) {
   const corpus = options.corpus || loadJson(path.join(DATA_DIR, "evidence-corpus.json"));
   const registry = options.registry || loadJson(path.join(DATA_DIR, "source-registry.json"));
   const samples = options.samples || loadJson(path.join(DATA_DIR, "sample-news.json"));
+  const newsFeeds = options.newsFeeds;
+  const fetchText = options.fetchText;
 
   return http.createServer(async (req, res) => {
     setHeaders(res);
@@ -71,6 +74,20 @@ function createServer(options = {}) {
       }
       if (req.method === "GET" && url.pathname === "/api/samples") {
         return writeJson(res, 200, { samples });
+      }
+      if (req.method === "GET" && url.pathname === "/api/live-news") {
+        const news = await fetchGlobalNews({
+          feeds: newsFeeds,
+          fetchText,
+          limit: 24,
+          perFeed: 4,
+          skipCache: Boolean(newsFeeds || fetchText)
+        });
+        const items = news.items.map((item) => ({
+          ...item,
+          verification: verifyArticle({ article: item, corpus, registry })
+        }));
+        return writeJson(res, 200, { ...news, items });
       }
       if (req.method === "GET" && url.pathname === "/api/corpus") {
         return writeJson(res, 200, {

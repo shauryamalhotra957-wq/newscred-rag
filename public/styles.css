@@ -227,9 +227,88 @@ button {
   background: rgba(18, 38, 56, 0.09);
 }
 
+.live-news,
 .results,
 .method {
   padding: clamp(2.4rem, 6vw, 5rem) clamp(1rem, 4vw, 3rem);
+}
+
+.live-news {
+  background: #eef4f2;
+}
+
+.live-note {
+  max-width: 58rem;
+  color: var(--muted);
+  line-height: 1.6;
+}
+
+.live-grid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+.live-card {
+  display: grid;
+  align-content: start;
+  gap: 0.75rem;
+  border: 1px solid var(--line);
+  border-radius: 8px;
+  padding: 1rem;
+  background: white;
+}
+
+.live-card h3 {
+  margin: 0;
+  font-size: 1.05rem;
+  line-height: 1.35;
+}
+
+.live-card p {
+  margin: 0;
+  color: var(--muted);
+  line-height: 1.5;
+}
+
+.live-meta,
+.live-verdict {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+}
+
+.live-meta span,
+.live-verdict span {
+  border-radius: 999px;
+  padding: 0.25rem 0.5rem;
+  color: var(--navy);
+  background: rgba(18, 38, 56, 0.08);
+  font-size: 0.72rem;
+  font-weight: 800;
+}
+
+.live-verdict {
+  align-items: center;
+  padding-top: 0.1rem;
+}
+
+.button-link {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 2.75rem;
+  border-radius: 7px;
+  padding: 0 0.9rem;
+  color: var(--navy);
+  background: rgba(18, 38, 56, 0.09);
+  font-weight: 800;
+}
+
+.actions.compact {
+  justify-content: flex-start;
+  flex-wrap: wrap;
 }
 
 .result-grid {
@@ -372,6 +451,7 @@ button {
   .workspace,
   .result-grid,
   .analysis-grid,
+  .live-grid,
   .method-grid {
     grid-template-columns: 1fr;
   }
