@@ -18,9 +18,15 @@ function parseCookies(header = "") {
       .filter(Boolean)
       .map((item) => {
         const index = item.indexOf("=");
-        if (index === -1) return [item, ""];
-        return [decodeURIComponent(item.slice(0, index)), decodeURIComponent(item.slice(index + 1))];
+        const rawName = index === -1 ? item : item.slice(0, index);
+        const rawValue = index === -1 ? "" : item.slice(index + 1);
+        try {
+          return [decodeURIComponent(rawName), decodeURIComponent(rawValue)];
+        } catch {
+          return ["", ""];
+        }
       })
+      .filter(([name]) => name)
   );
 }
 

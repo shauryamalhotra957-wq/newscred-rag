@@ -74,6 +74,22 @@ test("API blocks missing CSRF and verifies with valid CSRF", async () => {
   }
 });
 
+test("session endpoint tolerates malformed cookie encoding", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/session`, {
+      headers: { Cookie: "newscred_session=%zz; theme=dark" }
+    });
+    assert.equal(response.status, 200);
+    const payload = await response.json();
+    assert.ok(payload.csrfToken);
+    assert.match(response.headers.get("set-cookie"), /newscred_session=/);
+  } finally {
+    server.close();
+  }
+});
+
 test("live news endpoint normalizes feed stories and returns verifier output", async () => {
   const server = createServer({
     newsFeeds: [
