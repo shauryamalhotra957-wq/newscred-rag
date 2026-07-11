@@ -56,7 +56,7 @@ function renderList(items, className = "") {
 
 function formatDate(value) {
   const parsed = Date.parse(value);
-  if (!parsed) return "Date unknown";
+  if (Number.isNaN(parsed)) return "Date unknown";
   return new Intl.DateTimeFormat(undefined, {
     month: "short",
     day: "numeric",
@@ -217,4 +217,10 @@ async function init() {
   loadLiveNews();
 }
 
-init();
+if (typeof document !== "undefined") {
+  init();
+}
+
+if (typeof module !== "undefined") {
+  module.exports = { escapeHtml, formatDate };
+}
