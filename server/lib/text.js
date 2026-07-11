@@ -68,7 +68,7 @@ function splitSentences(input) {
 function extractDomain(url) {
   try {
     const parsed = new URL(String(url || ""));
-    return parsed.hostname.replace(/^www\./, "").toLowerCase();
+    return parsed.hostname.replace(/^www\./, "").replace(/\.$/, "").toLowerCase();
   } catch {
     return "";
   }

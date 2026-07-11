@@ -6,6 +6,7 @@ const { extractClaims, extractDomain, sanitizeText, tokenize } = require("../ser
 
 test("extractDomain normalizes hosts", () => {
   assert.equal(extractDomain("https://www.reuters.com/world/story"), "reuters.com");
+  assert.equal(extractDomain("https://www.reuters.com./world/story"), "reuters.com");
   assert.equal(extractDomain("not a url"), "");
 });
 
