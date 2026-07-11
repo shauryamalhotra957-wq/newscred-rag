@@ -58,11 +58,21 @@ let cache = {
   payload: null
 };
 
+function decodeCodePoint(value, radix = 10) {
+  const codePoint = Number.parseInt(value, radix);
+  if (!Number.isFinite(codePoint)) return "";
+  try {
+    return String.fromCodePoint(codePoint);
+  } catch {
+    return "";
+  }
+}
+
 function decodeEntities(value) {
   return String(value || "")
     .replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, "$1")
-    .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(Number(code)))
-    .replace(/&#x([0-9a-f]+);/gi, (_, code) => String.fromCharCode(parseInt(code, 16)))
+    .replace(/&#(\d+);/g, (_, code) => decodeCodePoint(code))
+    .replace(/&#x([0-9a-f]+);/gi, (_, code) => decodeCodePoint(code, 16))
     .replace(/&amp;/g, "&")
     .replace(/&lt;/g, "<")
     .replace(/&gt;/g, ">")
