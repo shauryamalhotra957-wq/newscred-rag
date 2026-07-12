@@ -4,6 +4,15 @@ NewsCred RAG is a working prototype for news verification. It checks source cred
 
 ![NewsCred RAG verification newsroom](public/assets/verification-newsroom.png)
 
+## Project Snapshot
+
+| Area | Detail |
+| --- | --- |
+| Experience | Newsroom-style verification console |
+| Core system | Source scoring, claim extraction, evidence retrieval, explainable verdicts |
+| Design signal | Evidence-first interface with local deterministic RAG trail |
+| Quality signal | Node test suite, product spec, RAG implementation notes, threat model |
+
 ## Why It Exists
 
 News verification should be explainable. This project does not simply label an article as true or false; it shows the signals behind the assessment: source strength, claim coverage, retrieved evidence, confidence, and gaps that need human review.
