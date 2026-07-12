@@ -16,6 +16,16 @@ function escapeHtml(value) {
   });
 }
 
+function safeExternalUrl(value) {
+  try {
+    const origin = typeof window !== "undefined" ? window.location.origin : "http://localhost";
+    const url = new URL(String(value || ""), origin);
+    return ["http:", "https:"].includes(url.protocol) ? url.href : "#";
+  } catch {
+    return "#";
+  }
+}
+
 function setStatus(text) {
   $("#apiStatus").textContent = text;
 }
@@ -91,7 +101,7 @@ function renderResult(result) {
           <h3>${escapeHtml(doc.title)}</h3>
           <p>${escapeHtml(doc.summary)}</p>
           <div class="metric-row"><span>${escapeHtml(doc.source)}</span><strong>match ${doc.score}</strong></div>
-          <a href="${escapeHtml(doc.sourceUrl)}" target="_blank" rel="noreferrer">Source reference</a>
+          <a href="${escapeHtml(safeExternalUrl(doc.sourceUrl))}" target="_blank" rel="noreferrer">Source reference</a>
         </article>
       `
     )
@@ -152,7 +162,7 @@ function renderLiveNews(payload) {
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 12l2 2 4-5M21 12a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z" /></svg>
               Check story
             </button>
-            <a class="button-link" href="${escapeHtml(item.sourceUrl)}" target="_blank" rel="noreferrer">Open source</a>
+            <a class="button-link" href="${escapeHtml(safeExternalUrl(item.sourceUrl))}" target="_blank" rel="noreferrer">Open source</a>
           </div>
         </article>
       `;
@@ -222,5 +232,5 @@ if (typeof document !== "undefined") {
 }
 
 if (typeof module !== "undefined") {
-  module.exports = { escapeHtml, formatDate };
+  module.exports = { escapeHtml, formatDate, safeExternalUrl };
 }
