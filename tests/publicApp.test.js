@@ -2,7 +2,10 @@
 
 const test = require("node:test");
 const assert = require("node:assert/strict");
+const { readFileSync } = require("node:fs");
 const { escapeHtml, formatDate, safeExternalUrl } = require("../public/app");
+
+const html = readFileSync("public/index.html", "utf8");
 
 test("formatDate treats only invalid dates as unknown", () => {
   assert.equal(formatDate("not a date"), "Date unknown");
@@ -18,4 +21,9 @@ test("safeExternalUrl allows only HTTP links in rendered anchors", () => {
   assert.equal(safeExternalUrl("http://example.com/story"), "http://example.com/story");
   assert.equal(safeExternalUrl("javascript:alert(1)"), "#");
   assert.equal(safeExternalUrl("data:text/html,<script>alert(1)</script>"), "#");
+});
+
+test("dynamic feed and API statuses are announced politely", () => {
+  assert.match(html, /id="apiStatus"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="liveStatus"[^>]*role="status"[^>]*aria-live="polite"/);
 });

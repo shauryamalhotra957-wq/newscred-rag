@@ -36,7 +36,7 @@
               <p class="kicker">Article intake</p>
               <h2>Credential check</h2>
             </div>
-            <span class="status-pill" id="apiStatus">Connecting</span>
+            <span class="status-pill" id="apiStatus" role="status" aria-live="polite">Connecting</span>
           </div>
 
           <label>
@@ -89,7 +89,7 @@
             Refresh
           </button>
         </div>
-        <p class="live-note" id="liveStatus">
+        <p class="live-note" id="liveStatus" role="status" aria-live="polite">
           Loading public RSS headlines from global newsrooms. Each card includes a source credibility preview and can be fact-checked with the local RAG verifier.
         </p>
         <div class="live-grid" id="liveNewsBody" aria-live="polite"></div>
