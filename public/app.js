@@ -628,7 +628,33 @@ function bindFilterControls(containerSelector) {
   });
 }
 
+function initEntryAnimation() {
+  const veil = $("#entryVeil");
+  const skip = $("#skipIntro");
+  const reduceMotion = typeof matchMedia === "function" && matchMedia("(prefers-reduced-motion: reduce)").matches;
+  if (!veil || reduceMotion) {
+    document.body.classList.add("intro-complete");
+    if (veil) veil.remove();
+    return;
+  }
+
+  document.body.classList.add("intro-running");
+  let finished = false;
+  const finish = () => {
+    if (finished) return;
+    finished = true;
+    veil.classList.add("is-done");
+    document.body.classList.remove("intro-running");
+    document.body.classList.add("intro-complete");
+    window.setTimeout(() => veil.remove(), 900);
+  };
+
+  skip?.addEventListener("click", finish);
+  window.setTimeout(finish, 3350);
+}
+
 async function init() {
+  initEntryAnimation();
   const date = $("#briefingDate");
   if (date) date.textContent = formatBriefDate();
   state.savedStories = readStoredJson("newscred_saved_stories", []);
