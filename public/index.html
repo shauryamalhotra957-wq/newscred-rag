@@ -16,11 +16,14 @@
       <nav aria-label="Primary">
         <a href="#briefing">Briefing</a>
         <a href="#blindspots">Blindspots</a>
+        <a href="#saved">Saved</a>
+        <a href="#flow">Flow</a>
         <a href="#sources">Sources</a>
         <a href="#add-story">Add story</a>
       </nav>
       <div class="top-actions">
         <span class="status-pill" id="apiStatus" role="status" aria-live="polite">Connecting</span>
+        <button class="ghost-button" type="button" id="toggleDensity" aria-pressed="false">Brief mode</button>
         <button class="icon-button" type="button" id="refreshNews" title="Refresh headlines" aria-label="Refresh headlines">
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M21 12a9 9 0 0 1-15.4 6.4M3 12A9 9 0 0 1 18.4 5.6M21 5v7h-7M3 19v-7h7" /></svg>
         </button>
@@ -34,6 +37,10 @@
             <p class="kicker">Edition</p>
             <h2>Global</h2>
             <p id="briefingDate">Today</p>
+            <div class="edition-signal">
+              <span></span>
+              Live source mix
+            </div>
           </section>
 
           <section class="rail-panel">
@@ -54,14 +61,31 @@
             <p class="kicker">Source watch</p>
             <div id="sourceBody" class="source-list empty">Loading sources.</div>
           </section>
+
+          <section class="rail-panel resource-panel">
+            <p class="kicker">Design lens</p>
+            <div class="resource-grid">
+              <span>Bias map</span>
+              <span>Flow states</span>
+              <span>Evidence cards</span>
+              <span>Saved brief</span>
+            </div>
+          </section>
         </aside>
 
         <section class="feed-column">
           <section class="briefing-card">
             <div class="briefing-copy">
               <p class="eyebrow">Daily briefing</p>
-              <h1 id="briefingTitle">Every side of the story, grounded by evidence.</h1>
-              <p class="lede">Live headlines are grouped by coverage balance, source strength, claim gaps, and retrieved evidence.</p>
+              <h1 id="briefingTitle">Coverage, grounded.</h1>
+              <p class="lede">Live headlines are grouped by coverage balance, source strength, claim gaps, and retrieved evidence. Save stories into a briefing queue or compare the evidence trail in one click.</p>
+            </div>
+            <div class="hero-orbit" aria-hidden="true">
+              <span class="orb orb-one"></span>
+              <span class="orb orb-two"></span>
+              <span class="orb orb-three"></span>
+              <span class="orbit-card primary-orbit-card">RAG</span>
+              <span class="orbit-card secondary-orbit-card">BIAS</span>
             </div>
             <dl class="briefing-stats">
               <div>
@@ -81,6 +105,27 @@
                 <dd id="originalRate">--</dd>
               </div>
             </dl>
+          </section>
+
+          <section class="insight-grid" aria-label="Coverage insights">
+            <article class="insight-card">
+              <p class="kicker">Signal</p>
+              <h3>Source diversity</h3>
+              <div class="insight-meter"><span id="diversityMeter"></span></div>
+              <p id="diversityCopy">Waiting for live feed.</p>
+            </article>
+            <article class="insight-card">
+              <p class="kicker">Queue</p>
+              <h3>Saved briefing</h3>
+              <strong id="savedCount">0</strong>
+              <p>Build a focused stack before opening the evidence trail.</p>
+            </article>
+            <article class="insight-card">
+              <p class="kicker">Review</p>
+              <h3>Evidence depth</h3>
+              <strong id="evidenceDepth">--</strong>
+              <p>Average retrieved references after comparison.</p>
+            </article>
           </section>
 
           <section class="feed-toolbar" aria-label="Story filters">
@@ -107,9 +152,19 @@
             <div id="selectedStoryBody" class="selected-story empty">No story compared yet.</div>
           </section>
 
+          <section class="rail-panel" id="saved">
+            <p class="kicker">Saved briefing</p>
+            <div id="savedBriefingBody" class="saved-list empty">No saved stories yet.</div>
+          </section>
+
           <section class="rail-panel" id="blindspots">
             <p class="kicker">Blindspot radar</p>
             <div id="blindspotBody" class="blindspot-list empty">Loading blindspots.</div>
+          </section>
+
+          <section class="rail-panel flow-panel" id="flow">
+            <p class="kicker">Flow map</p>
+            <div id="flowBody" class="flow-list"></div>
           </section>
         </aside>
       </section>
@@ -197,6 +252,40 @@
         </section>
       </section>
     </main>
+
+    <footer class="site-footer" id="method">
+      <div class="footer-marquee" aria-hidden="true">NEWSCRED / RAG / COVERAGE / EVIDENCE /</div>
+      <div class="footer-grid">
+        <div class="footer-brand">
+          <span class="brand-mark">NC</span>
+          <h2>NewsCred Studio</h2>
+          <p>Dark editorial intelligence for scanning narratives, saving briefings, and inspecting evidence without making the interface feel like a form.</p>
+        </div>
+        <nav aria-label="Footer product links">
+          <h3>Product</h3>
+          <a href="#briefing">Daily briefing</a>
+          <a href="#saved">Saved queue</a>
+          <a href="#flow">Evidence flow</a>
+          <a href="#add-story">Compare story</a>
+        </nav>
+        <nav aria-label="Footer method links">
+          <h3>Method</h3>
+          <a href="#sources">Source watch</a>
+          <a href="#blindspots">Blindspot radar</a>
+          <a href="#evidence">RAG evidence</a>
+          <a href="https://ground.news/" target="_blank" rel="noreferrer">Coverage inspiration</a>
+        </nav>
+        <form class="footer-form">
+          <h3>Briefing digest</h3>
+          <label>
+            <span>Email</span>
+            <input type="email" placeholder="you@example.com" />
+          </label>
+          <button class="primary" type="button">Preview digest</button>
+          <p>No signup is sent in this prototype.</p>
+        </form>
+      </div>
+    </footer>
 
     <script src="/app.js?v=20260714" defer></script>
   </body>

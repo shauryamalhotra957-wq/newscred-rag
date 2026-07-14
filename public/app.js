@@ -7,7 +7,9 @@ const state = {
   activeFilter: "all",
   query: "",
   selectedIndex: null,
-  lastResult: null
+  lastResult: null,
+  savedStories: [],
+  compactMode: false
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -43,6 +45,24 @@ function displayHost(value, fallback = "Unknown source") {
 function setStatus(text) {
   const status = $("#apiStatus");
   if (status) status.textContent = text;
+}
+
+function readStoredJson(key, fallback) {
+  try {
+    if (typeof localStorage === "undefined") return fallback;
+    const value = localStorage.getItem(key);
+    return value ? JSON.parse(value) : fallback;
+  } catch {
+    return fallback;
+  }
+}
+
+function writeStoredJson(key, value) {
+  try {
+    if (typeof localStorage !== "undefined") localStorage.setItem(key, JSON.stringify(value));
+  } catch {
+    /* Local persistence is a convenience only. */
+  }
 }
 
 async function api(path, options = {}) {
@@ -113,6 +133,10 @@ function hashText(value) {
 
 function storyText(item) {
   return [item.title, item.summary, item.body, item.source, item.region].filter(Boolean).join(" ").toLowerCase();
+}
+
+function storyKey(item) {
+  return safeExternalUrl(item.sourceUrl || item.article?.sourceUrl || item.id || item.title);
 }
 
 function storyTopic(item) {
@@ -233,10 +257,22 @@ function renderStats() {
   const averageOriginal = profiles.length
     ? Math.round(profiles.reduce((sum, profile) => sum + profile.original, 0) / profiles.length)
     : 0;
+  const sourceCount = new Set(stories.map((item) => item.source)).size;
+  const diversity = stories.length ? Math.round((sourceCount / stories.length) * 100) : 0;
   setMetric("#storyCount", stories.length || "--");
-  setMetric("#sourceCount", new Set(stories.map((item) => item.source)).size || "--");
+  setMetric("#sourceCount", sourceCount || "--");
   setMetric("#blindspotCount", profiles.filter((profile) => profile.blindspot).length || "--");
   setMetric("#originalRate", profiles.length ? `${averageOriginal}%` : "--");
+  setMetric("#savedCount", state.savedStories.length);
+  setMetric("#evidenceDepth", state.lastResult?.evidence?.length ? `${state.lastResult.evidence.length}/5` : "--");
+  const diversityMeter = $("#diversityMeter");
+  if (diversityMeter) diversityMeter.style.width = `${clamp(diversity * 2.4, 8, 100)}%`;
+  const diversityCopy = $("#diversityCopy");
+  if (diversityCopy) {
+    diversityCopy.textContent = stories.length
+      ? `${sourceCount} source families across ${stories.length} stories in this live slice.`
+      : "Waiting for live feed.";
+  }
 }
 
 function renderBriefing(stories) {
@@ -314,6 +350,88 @@ function renderBlindspots(stories = state.liveNews) {
     : "No major coverage gaps in this slice.";
 }
 
+function isSaved(item) {
+  const key = storyKey(item);
+  return state.savedStories.some((saved) => storyKey(saved) === key);
+}
+
+function compactStory(item) {
+  return {
+    id: item.id,
+    source: item.source,
+    region: item.region,
+    title: item.title,
+    sourceUrl: item.sourceUrl,
+    author: item.author,
+    publishedAt: item.publishedAt,
+    body: item.body,
+    summary: item.summary,
+    verification: item.verification
+  };
+}
+
+function saveStory(item) {
+  if (!item) return;
+  const key = storyKey(item);
+  if (state.savedStories.some((saved) => storyKey(saved) === key)) {
+    state.savedStories = state.savedStories.filter((saved) => storyKey(saved) !== key);
+  } else {
+    state.savedStories = [compactStory(item), ...state.savedStories].slice(0, 8);
+  }
+  writeStoredJson("newscred_saved_stories", state.savedStories);
+  renderDashboard();
+}
+
+function renderSavedStories() {
+  const body = $("#savedBriefingBody");
+  if (!body) return;
+  body.classList.toggle("empty", state.savedStories.length === 0);
+  body.innerHTML = state.savedStories.length
+    ? state.savedStories
+        .map(
+          (item) => `
+            <article class="saved-item">
+              <button type="button" data-saved-key="${escapeHtml(storyKey(item))}">
+                <span>${escapeHtml(item.source || "Saved source")}</span>
+                <strong>${escapeHtml(item.title || "Untitled story")}</strong>
+              </button>
+              <button class="remove-save" type="button" data-remove-saved="${escapeHtml(storyKey(item))}" aria-label="Remove saved story">Remove</button>
+            </article>
+          `
+        )
+        .join("")
+    : "No saved stories yet.";
+}
+
+function renderFlowMap() {
+  const body = $("#flowBody");
+  if (!body) return;
+  const evidenceCount = state.lastResult?.evidence?.length || 0;
+  const claimCount = state.lastResult?.claims?.length || 0;
+  const warningCount = state.lastResult?.warnings?.length || 0;
+  const score = Number(state.lastResult?.score || 0);
+  const rows = [
+    ["Intake", state.liveNews.length ? `${state.liveNews.length} live stories` : "Loading feed", "done"],
+    ["Scan", state.selectedIndex !== null ? "Story selected" : "Select a story", state.selectedIndex !== null ? "done" : "idle"],
+    ["Retrieve", evidenceCount ? `${evidenceCount} evidence refs` : "Awaiting compare", evidenceCount ? "done" : "idle"],
+    ["Assess", score ? `${score}/100 credibility` : "No assessment yet", score ? verdictTone(score) : "idle"],
+    ["Review", warningCount ? `${warningCount} warnings` : `${claimCount || 0} claims`, warningCount ? "risk" : "credible"]
+  ];
+  body.innerHTML = rows
+    .map(
+      ([label, detail, tone]) => `
+        <div class="flow-row ${tone}">
+          <span></span>
+          <div>
+            <strong>${escapeHtml(label)}</strong>
+            <p>${escapeHtml(detail)}</p>
+          </div>
+        </div>
+      `
+    )
+    .join("");
+}
+
 function renderStoryCard(item, index) {
   const verification = item.verification || {};
   const score = Number(verification.score ?? 0);
@@ -321,6 +439,7 @@ function renderStoryCard(item, index) {
   const verdict = verification.verdict?.label || scoreLabel(score);
   const profile = coverageProfile(item);
   const isActive = state.selectedIndex === index;
+  const saved = isSaved(item);
   return `
     <article class="story-card ${isActive ? "active" : ""}">
       <div class="story-topline">
@@ -342,6 +461,9 @@ function renderStoryCard(item, index) {
           <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16M4 12h10M4 18h7M17 14l3 3-3 3" /></svg>
           Compare
         </button>
+        <button class="secondary save-button ${saved ? "saved" : ""}" type="button" data-save-index="${index}" aria-pressed="${saved ? "true" : "false"}">
+          ${saved ? "Saved" : "Save"}
+        </button>
         <a class="button-link" href="${escapeHtml(safeExternalUrl(item.sourceUrl))}" target="_blank" rel="noreferrer">Open source</a>
         <span class="verdict-pill ${verdictTone(score)}">${escapeHtml(verdict)}</span>
       </div>
@@ -353,6 +475,8 @@ function renderDashboard() {
   updateActiveButtons();
   renderStats();
   renderSources();
+  renderSavedStories();
+  renderFlowMap();
   const stories = filteredStories();
   renderBriefing(stories);
   renderBlindspots(stories.length ? stories : state.liveNews);
@@ -435,6 +559,8 @@ function renderResult(result, item = null) {
   const gaps = result.comparison.gaps.map((gap) => `<span class="tag warning">Gap: ${escapeHtml(gap)}</span>`).join("");
   $("#signalsBody").innerHTML = `<div class="tag-row">${strengths}${warnings}${gaps}</div>`;
   renderSelectedStory(item, result);
+  renderFlowMap();
+  renderStats();
 }
 
 async function compareCurrentArticle() {
@@ -452,6 +578,10 @@ async function compareCurrentArticle() {
 async function compareLiveStory(index) {
   const item = state.liveNews[index];
   if (!item) return;
+  await compareStoryItem(item, index);
+}
+
+async function compareStoryItem(item, index = null) {
   state.selectedIndex = index;
   $("#title").value = item.title || "";
   $("#sourceUrl").value = item.sourceUrl || "";
@@ -501,6 +631,14 @@ function bindFilterControls(containerSelector) {
 async function init() {
   const date = $("#briefingDate");
   if (date) date.textContent = formatBriefDate();
+  state.savedStories = readStoredJson("newscred_saved_stories", []);
+  state.compactMode = Boolean(readStoredJson("newscred_compact_mode", false));
+  document.body.classList.toggle("compact-feed", state.compactMode);
+  const densityButton = $("#toggleDensity");
+  if (densityButton) {
+    densityButton.setAttribute("aria-pressed", state.compactMode ? "true" : "false");
+    densityButton.textContent = state.compactMode ? "Detailed mode" : "Brief mode";
+  }
 
   try {
     const session = await api("/api/session");
@@ -523,6 +661,13 @@ async function init() {
   $("#loadCredible").addEventListener("click", () => loadSample(0));
   $("#loadRisky").addEventListener("click", () => loadSample(1));
   $("#refreshNews").addEventListener("click", () => loadLiveNews());
+  $("#toggleDensity").addEventListener("click", () => {
+    state.compactMode = !state.compactMode;
+    document.body.classList.toggle("compact-feed", state.compactMode);
+    $("#toggleDensity").setAttribute("aria-pressed", state.compactMode ? "true" : "false");
+    $("#toggleDensity").textContent = state.compactMode ? "Detailed mode" : "Brief mode";
+    writeStoredJson("newscred_compact_mode", state.compactMode);
+  });
   $("#storySearch").addEventListener("input", (event) => {
     state.query = event.target.value;
     renderDashboard();
@@ -530,6 +675,11 @@ async function init() {
   bindFilterControls("#topicFilters");
   bindFilterControls("#quickFilters");
   $("#liveNewsBody").addEventListener("click", (event) => {
+    const saveButton = event.target.closest("[data-save-index]");
+    if (saveButton) {
+      saveStory(state.liveNews[Number(saveButton.dataset.saveIndex)]);
+      return;
+    }
     const button = event.target.closest("[data-live-index]");
     if (!button) return;
     compareLiveStory(Number(button.dataset.liveIndex)).catch((error) => {
@@ -547,7 +697,26 @@ async function init() {
       $("#verdictNote").textContent = error.message;
     });
   });
+  $("#savedBriefingBody").addEventListener("click", (event) => {
+    const remove = event.target.closest("[data-remove-saved]");
+    if (remove) {
+      state.savedStories = state.savedStories.filter((item) => storyKey(item) !== remove.dataset.removeSaved);
+      writeStoredJson("newscred_saved_stories", state.savedStories);
+      renderDashboard();
+      return;
+    }
+    const saved = event.target.closest("[data-saved-key]");
+    if (!saved) return;
+    const item = state.savedStories.find((story) => storyKey(story) === saved.dataset.savedKey);
+    compareStoryItem(item, state.liveNews.findIndex((story) => storyKey(story) === storyKey(item))).catch((error) => {
+      setStatus("Try again");
+      $("#verdictLabel").textContent = "Could not compare";
+      $("#verdictNote").textContent = error.message;
+    });
+  });
   renderSelectedStory();
+  renderSavedStories();
+  renderFlowMap();
   loadLiveNews();
 }
 
