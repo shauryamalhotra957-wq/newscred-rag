@@ -1,0 +1,46 @@
+:root {
+  --experience-ring: rgba(30, 58, 95, 0.72);
+  --experience-radius: 18px;
+}
+
+html { scrollbar-gutter: stable; }
+::selection { color: #fff; background: #1e3a5f; }
+
+:where(button, input, select, textarea, a) { touch-action: manipulation; }
+:where(button, .button-link, .tab-button, .icon-button) { min-block-size: 44px; }
+:where(input, select, textarea) { min-block-size: 44px; font-size: max(1rem, 16px); }
+
+:where(button, input, select, textarea, a):focus-visible {
+  outline: 3px solid var(--experience-ring);
+  outline-offset: 3px;
+}
+
+:where(.score-card, .rail-panel, .briefing-card, .briefing-item, .story-card, .selected-story, .panel) {
+  border-radius: var(--experience-radius);
+  border-color: rgba(30, 58, 95, 0.15);
+  box-shadow: 0 18px 48px rgba(22, 32, 44, 0.1);
+}
+
+:where(.briefing-card h1, .story-card h2, .selected-story h3) {
+  text-wrap: balance;
+}
+
+:where(.briefing-item, .story-card, .source-list li) {
+  transition: border-color 200ms ease, background-color 200ms ease, box-shadow 200ms ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  :where(.briefing-item, .story-card):hover {
+    border-color: rgba(30, 58, 95, 0.3);
+    box-shadow: 0 20px 54px rgba(30, 58, 95, 0.12);
+  }
+}
+
+@media (max-width: 640px) {
+  :root { --experience-radius: 15px; }
+  .feed-tabs { overflow-x: auto; scrollbar-width: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+}
