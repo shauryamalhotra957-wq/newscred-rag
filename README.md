@@ -142,3 +142,7 @@ newscred-rag/
 
 This project is currently marked `UNLICENSED` in `package.json`. Add a license before accepting external contributions or reuse.
 
+## Experience Design
+
+The credibility workspace follows the [NewsCred design system](design-system/newscred-rag/MASTER.md), using editorial hierarchy, trust-oriented color, readable evidence surfaces, keyboard focus, and responsive navigation.
+
