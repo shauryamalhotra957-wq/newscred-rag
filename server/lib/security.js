@@ -130,10 +130,23 @@ function writeJson(res, status, payload) {
 }
 
 function cleanup() {
-  const cutoff = Date.now() - 2 * 60 * 60 * 1000;
+  const now = Date.now();
+  const cutoff = now - 2 * 60 * 60 * 1000;
+  let sessionsRemoved = 0;
+  let bucketsRemoved = 0;
   for (const [id, session] of sessions.entries()) {
-    if (session.lastSeen < cutoff) sessions.delete(id);
+    if (session.lastSeen < cutoff) {
+      sessions.delete(id);
+      sessionsRemoved += 1;
+    }
   }
+  for (const [key, bucket] of buckets.entries()) {
+    if (now - bucket.started > WINDOW_MS) {
+      buckets.delete(key);
+      bucketsRemoved += 1;
+    }
+  }
+  return { sessionsRemoved, bucketsRemoved };
 }
 
 module.exports = {
