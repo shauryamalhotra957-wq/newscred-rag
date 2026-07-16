@@ -182,7 +182,9 @@ async function fetchGlobalNews(options = {}) {
     feeds: feedResults.map(({ feed, ok, count, error }) => ({ feed, ok, count, error })),
     items
   };
-  cache = { fetchedAt: now, payload };
+  if (feedResults.some((result) => result.ok)) {
+    cache = { fetchedAt: now, payload };
+  }
   return payload;
 }
 
