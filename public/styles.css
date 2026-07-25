@@ -376,6 +376,18 @@ button {
   background: transparent;
 }
 
+.search-box kbd {
+  display: grid;
+  min-width: 1.7rem;
+  min-height: 1.7rem;
+  place-items: center;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.04);
+  font: 750 0.72rem/1 var(--font-mono, monospace);
+}
+
 .feed-tabs {
   gap: 0.35rem;
   flex-wrap: wrap;
@@ -390,6 +402,28 @@ button {
 .live-note {
   margin: 0;
   line-height: 1.5;
+}
+
+.filter-status {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.75rem;
+  letter-spacing: 0.04em;
+}
+
+.icon-button.is-loading svg {
+  animation: refreshSpin 700ms linear infinite;
+}
+
+.icon-button:disabled {
+  cursor: progress;
+  opacity: 0.7;
+}
+
+@keyframes refreshSpin {
+  to {
+    transform: rotate(360deg);
+  }
 }
 
 .briefing-strip {

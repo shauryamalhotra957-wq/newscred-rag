@@ -9,7 +9,8 @@ const state = {
   selectedIndex: null,
   lastResult: null,
   savedStories: [],
-  compactMode: false
+  compactMode: false,
+  refreshing: false
 };
 
 const $ = (selector) => document.querySelector(selector);
@@ -478,6 +479,10 @@ function renderDashboard() {
   renderSavedStories();
   renderFlowMap();
   const stories = filteredStories();
+  const filterStatus = $("#filterStatus");
+  if (filterStatus) {
+    filterStatus.textContent = `${stories.length} of ${state.liveNews.length} stories shown`;
+  }
   renderBriefing(stories);
   renderBlindspots(stories.length ? stories : state.liveNews);
   const liveBody = $("#liveNewsBody");
@@ -597,7 +602,11 @@ function renderLiveNews(payload) {
   state.liveNews = payload.items || [];
   const healthyFeeds = (payload.feeds || []).filter((feed) => feed.ok).length;
   const totalFeeds = (payload.feeds || []).length;
-  $("#liveStatus").textContent = `${state.liveNews.length} stories from ${healthyFeeds}/${totalFeeds} available feeds. Coverage mix is a local demo estimate.`;
+  const refreshedAt = new Intl.DateTimeFormat(undefined, {
+    hour: "2-digit",
+    minute: "2-digit"
+  }).format(new Date());
+  $("#liveStatus").textContent = `${state.liveNews.length} stories from ${healthyFeeds}/${totalFeeds} available feeds. Updated ${refreshedAt}; coverage mix is a local demo estimate.`;
   if (!state.liveNews.length) {
     $("#liveNewsBody").innerHTML = '<div class="empty state-card">No live headlines loaded.</div>';
     return;
@@ -606,14 +615,33 @@ function renderLiveNews(payload) {
 }
 
 async function loadLiveNews() {
-  $("#liveStatus").textContent = "Loading live coverage.";
-  $("#liveNewsBody").innerHTML = '<div class="empty state-card">Fetching public RSS feeds.</div>';
+  if (state.refreshing) return;
+  state.refreshing = true;
+  const refreshButton = $("#refreshNews");
+  refreshButton?.setAttribute("aria-busy", "true");
+  refreshButton?.classList.add("is-loading");
+  if (refreshButton) refreshButton.disabled = true;
+  $("#liveNewsBody")?.setAttribute("aria-busy", "true");
+  $("#liveStatus").textContent = state.liveNews.length
+    ? "Refreshing live coverage. The current briefing remains available."
+    : "Loading live coverage.";
+  if (!state.liveNews.length) {
+    $("#liveNewsBody").innerHTML = '<div class="empty state-card">Fetching public RSS feeds.</div>';
+  }
   try {
     const payload = await api("/api/live-news");
     renderLiveNews(payload);
   } catch (error) {
     $("#liveStatus").textContent = error.message;
-    $("#liveNewsBody").innerHTML = '<div class="empty state-card">Live feed loading failed. Add a story manually below.</div>';
+    if (!state.liveNews.length) {
+      $("#liveNewsBody").innerHTML = '<div class="empty state-card">Live feed loading failed. Add a story manually below.</div>';
+    }
+  } finally {
+    state.refreshing = false;
+    refreshButton?.setAttribute("aria-busy", "false");
+    refreshButton?.classList.remove("is-loading");
+    if (refreshButton) refreshButton.disabled = false;
+    $("#liveNewsBody")?.setAttribute("aria-busy", "false");
   }
 }
 
@@ -697,6 +725,23 @@ async function init() {
   $("#storySearch").addEventListener("input", (event) => {
     state.query = event.target.value;
     renderDashboard();
+  });
+  document.addEventListener("keydown", (event) => {
+    const target = event.target;
+    const editing = target instanceof HTMLInputElement
+      || target instanceof HTMLTextAreaElement
+      || target instanceof HTMLSelectElement
+      || target?.isContentEditable;
+    if (event.key === "/" && !editing && !event.metaKey && !event.ctrlKey && !event.altKey) {
+      event.preventDefault();
+      $("#storySearch").focus();
+    }
+    if (event.key === "Escape" && document.activeElement === $("#storySearch") && (state.query || state.activeFilter !== "all")) {
+      state.query = "";
+      state.activeFilter = "all";
+      $("#storySearch").value = "";
+      renderDashboard();
+    }
   });
   bindFilterControls("#topicFilters");
   bindFilterControls("#quickFilters");

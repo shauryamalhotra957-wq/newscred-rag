@@ -160,7 +160,8 @@
           <section class="feed-toolbar" aria-label="Story filters">
             <label class="search-box">
               <svg viewBox="0 0 24 24" aria-hidden="true"><path d="m21 21-4.3-4.3M10.8 18a7.2 7.2 0 1 1 0-14.4 7.2 7.2 0 0 1 0 14.4Z" /></svg>
-              <input id="storySearch" type="search" placeholder="Search stories or sources" autocomplete="off" />
+              <input id="storySearch" type="search" placeholder="Search stories or sources" autocomplete="off" aria-label="Search stories or sources" aria-keyshortcuts="/" />
+              <kbd aria-hidden="true">/</kbd>
             </label>
             <div class="feed-tabs" id="quickFilters">
               <button class="tab-button active" type="button" data-filter="all" aria-pressed="true">All</button>
@@ -170,6 +171,7 @@
             </div>
           </section>
 
+          <p class="filter-status" id="filterStatus" role="status" aria-live="polite">0 stories shown</p>
           <p class="live-note" id="liveStatus" role="status" aria-live="polite">Loading live coverage.</p>
           <div class="briefing-strip" id="briefingBody"></div>
           <div class="story-stack" id="liveNewsBody" aria-live="polite"></div>

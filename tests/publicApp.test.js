@@ -25,5 +25,11 @@ test("safeExternalUrl allows only HTTP links in rendered anchors", () => {
 
 test("dynamic feed and API statuses are announced politely", () => {
   assert.match(html, /id="apiStatus"[^>]*role="status"[^>]*aria-live="polite"/);
+  assert.match(html, /id="filterStatus"[^>]*role="status"[^>]*aria-live="polite"/);
   assert.match(html, /id="liveStatus"[^>]*role="status"[^>]*aria-live="polite"/);
+});
+
+test("story search exposes a label and discoverable keyboard shortcut", () => {
+  assert.match(html, /id="storySearch"[^>]*aria-label="Search stories or sources"/);
+  assert.match(html, /id="storySearch"[^>]*aria-keyshortcuts="\/"/);
 });
