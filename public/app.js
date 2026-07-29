@@ -61,7 +61,6 @@ function writeStoredJson(key, value) {
   try {
     if (typeof localStorage !== "undefined") localStorage.setItem(key, JSON.stringify(value));
   } catch {
-    /* Local persistence is a convenience only. */
   }
 }
 

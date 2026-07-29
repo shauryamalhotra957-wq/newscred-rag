@@ -912,7 +912,6 @@ textarea {
   }
 }
 
-/* Dark editorial refresh */
 :root {
   --ink: #f4f0e8;
   --muted: #a9b2bd;
@@ -1481,7 +1480,6 @@ textarea::placeholder {
   }
 }
 
-/* Cinematic entry animation */
 .entry-veil {
   position: fixed;
   inset: 0;
