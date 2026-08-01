@@ -46,7 +46,7 @@ npm.cmd run validate
 ## Quick Start
 
 ```powershell
-npm install
+npm ci
 npm start
 ```
 
