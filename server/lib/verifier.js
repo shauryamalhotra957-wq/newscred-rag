@@ -86,6 +86,12 @@ function verifyArticle({ article, corpus, registry }) {
     Math.min(100, Math.round(credential.score * 0.42 + evidenceScore * 0.34 + supportRatio * 24 + strengthBonus - gapPenalty - riskPenalty))
   );
   const verdict = verdictFromScore(finalScore);
+  const evidenceSummary = {
+    retrieved: evidence.length,
+    supportedClaims: comparison.support.length,
+    unsupportedClaims: comparison.gaps.length,
+    averageScore: evidenceScore
+  };
 
   return {
     id: `check_${Date.now().toString(36)}`,
@@ -105,6 +111,7 @@ function verifyArticle({ article, corpus, registry }) {
       similarity: doc.similarity
     })),
     comparison,
+    evidenceSummary,
     strengths: risks.strengths,
     warnings: [...credential.warnings, ...risks.warnings],
     method: {

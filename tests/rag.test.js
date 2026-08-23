@@ -19,3 +19,12 @@ test("retrieveEvidence returns relevant health baseline for cure claim", () => {
   });
   assert.ok(docs.some((doc) => doc.id === "health-misinfo-checks"));
 });
+
+test("retrieveEvidence does not treat a topic substring as a topic hit", () => {
+  const [result] = retrieveEvidence({
+    query: "The artwork is beautiful",
+    corpus: [{ id: "art", title: "Arts report", source: "Example", summary: "Culture", credibility: 50, topics: ["art"] }],
+    topK: 1
+  });
+  assert.equal(result.score, 2);
+});

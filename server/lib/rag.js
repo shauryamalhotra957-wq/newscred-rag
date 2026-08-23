@@ -31,7 +31,7 @@ function retrieveEvidence({ query, claims = [], corpus, topK = 5 }) {
     .map((doc) => {
       const docTokens = tokenize(evidenceText(doc));
       const similarity = cosineSimilarity(queryTokens, docTokens);
-      const topicHits = (doc.topics || []).filter((topic) => query.toLowerCase().includes(topic.toLowerCase())).length;
+      const topicHits = (doc.topics || []).filter((topic) => tokenize(topic).every((token) => queryTokens.includes(token))).length;
       const score = similarity * 100 + topicHits * 4 + Number(doc.credibility || 0) / 25;
       return {
         ...doc,

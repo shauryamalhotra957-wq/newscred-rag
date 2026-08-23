@@ -6,6 +6,8 @@
   "scripts": {
     "start": "node server/index.js",
     "test": "node --test tests/*.test.js",
+    "test:api": "node --test tests/api.test.js",
+    "test:verification": "node --test tests/credentials.test.js tests/rag.test.js tests/text.test.js tests/verifier.test.js",
     "validate": "npm run test"
   },
   "keywords": [

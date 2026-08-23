@@ -32,3 +32,9 @@ test("known primary source scores higher than unregistered source", () => {
   assert.ok(trusted.score > unknown.score);
   assert.ok(unknown.warnings.length > trusted.warnings.length);
 });
+
+test("invalid publication dates do not receive a credential bonus", () => {
+  const result = scoreSourceCredentials({ sourceUrl: "https://who.int/news", author: "WHO", publishedAt: "sometime soon", body: "Official report with data and a study." }, registry);
+  assert.ok(result.warnings.includes("Publication date is invalid"));
+  assert.equal(result.signals.includes("Publication date supplied"), false);
+});

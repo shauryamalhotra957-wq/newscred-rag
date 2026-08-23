@@ -128,6 +128,10 @@ newscred-rag/
 - [Product Spec](docs/product-spec.md)
 - [RAG Implementation](docs/rag-implementation.md)
 - [Threat Model](docs/threat-model.md)
+- [HTTP API](docs/api.md)
+- [Data Model](docs/data-model.md)
+- [Operations Guide](docs/operations.md)
+- [Accessibility Notes](docs/accessibility.md)
 - [Security Policy](SECURITY.md)
 
 ## Research Grounding
@@ -145,4 +149,3 @@ This project is currently marked `UNLICENSED` in `package.json`. Add a license b
 ## Experience Design
 
 The credibility workspace follows the [NewsCred design system](design-system/newscred-rag/MASTER.md), using editorial hierarchy, trust-oriented color, readable evidence surfaces, keyboard focus, and responsive navigation.
-

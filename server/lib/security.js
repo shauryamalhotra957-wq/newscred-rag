@@ -54,6 +54,13 @@ function setHeaders(res) {
   );
 }
 
+function requestId(req, res) {
+  const supplied = String(req.headers["x-request-id"] || "");
+  const id = /^[a-zA-Z0-9_-]{8,80}$/.test(supplied) ? supplied : token(12);
+  res.setHeader("X-Request-Id", id);
+  return id;
+}
+
 function getSession(req, res) {
   const cookies = parseCookies(req.headers.cookie);
   const id = cookies.newscred_session;
@@ -125,7 +132,7 @@ function readBody(req, maxBytes = 64 * 1024) {
 }
 
 function writeJson(res, status, payload) {
-  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8" });
+  res.writeHead(status, { "Content-Type": "application/json; charset=utf-8", "Cache-Control": "no-store" });
   res.end(JSON.stringify(payload));
 }
 
@@ -142,6 +149,7 @@ module.exports = {
   getSession,
   readBody,
   requireCsrf,
+  requestId,
   setHeaders,
   writeJson
 };

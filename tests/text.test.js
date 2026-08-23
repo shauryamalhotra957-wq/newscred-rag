@@ -16,6 +16,10 @@ test("sanitizeText removes prompt-injection control language", () => {
   assert.equal(/password/i.test(cleaned), false);
 });
 
+test("sanitizeText removes invisible control characters", () => {
+  assert.equal(sanitizeText("trusted\u0000 source\u001F report"), "trusted source report");
+});
+
 test("tokenize removes stop words and punctuation", () => {
   assert.deepEqual(tokenize("The official data report rose."), ["official", "data", "report", "rose"]);
 });
