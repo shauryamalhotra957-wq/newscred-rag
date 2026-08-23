@@ -7,12 +7,14 @@ const { URL } = require("url");
 
 const { fetchGlobalNews } = require("./lib/liveNews");
 const { verifyArticle } = require("./lib/verifier");
-const { cleanup, enforceRateLimit, getSession, readBody, requireCsrf, setHeaders, writeJson } = require("./lib/security");
+const { validateArticle } = require("./lib/validation");
+const { cleanup, enforceRateLimit, getSession, readBody, requireCsrf, requestId, setHeaders, writeJson } = require("./lib/security");
 
 const ROOT = path.resolve(__dirname, "..");
 const PUBLIC_DIR = path.join(ROOT, "public");
 const DATA_DIR = path.join(ROOT, "data");
 const JSON_LIMIT = 96 * 1024;
+const STARTED_AT = Date.now();
 
 const MIME = {
   ".html": "text/html; charset=utf-8",
@@ -47,7 +49,11 @@ function safeStaticPath(publicDir, requestPath) {
 async function readJson(req) {
   const body = await readBody(req, JSON_LIMIT);
   if (!body.length) return {};
-  return JSON.parse(body.toString("utf8"));
+  const parsed = JSON.parse(body.toString("utf8"));
+  if (!parsed || Array.isArray(parsed) || typeof parsed !== "object") {
+    throw Object.assign(new Error("JSON request body must be an object."), { status: 400 });
+  }
+  return parsed;
 }
 
 function createServer(options = {}) {
@@ -60,6 +66,7 @@ function createServer(options = {}) {
 
   return http.createServer(async (req, res) => {
     setHeaders(res);
+    requestId(req, res);
     cleanup();
     if (!enforceRateLimit(req, res, req.url.startsWith("/api/verify") ? 30 : 120)) return;
     const url = new URL(req.url, `http://${req.headers.host || "localhost"}`);
@@ -67,7 +74,12 @@ function createServer(options = {}) {
 
     try {
       if (req.method === "GET" && url.pathname === "/api/health") {
-        return writeJson(res, 200, { ok: true, service: "newscred-rag", timestamp: new Date().toISOString() });
+        return writeJson(res, 200, {
+          ok: true,
+          service: "newscred-rag",
+          timestamp: new Date().toISOString(),
+          uptimeSeconds: Math.floor((Date.now() - STARTED_AT) / 1000)
+        });
       }
       if (req.method === "GET" && url.pathname === "/api/session") {
         return writeJson(res, 200, { csrfToken: session.csrf, maxArticleBytes: JSON_LIMIT });
@@ -90,8 +102,14 @@ function createServer(options = {}) {
         return writeJson(res, 200, { ...news, items });
       }
       if (req.method === "GET" && url.pathname === "/api/corpus") {
+        const query = String(url.searchParams.get("q") || "").trim().toLowerCase();
+        const requestedLimit = Number(url.searchParams.get("limit"));
+        const limit = Number.isInteger(requestedLimit) ? Math.max(1, Math.min(requestedLimit, 100)) : 100;
+        const filteredCorpus = query
+          ? corpus.filter((doc) => [doc.title, doc.source, doc.summary, ...(doc.topics || [])].join(" ").toLowerCase().includes(query))
+          : corpus;
         return writeJson(res, 200, {
-          documents: corpus.map((doc) => ({
+          documents: filteredCorpus.slice(0, limit).map((doc) => ({
             id: doc.id,
             title: doc.title,
             source: doc.source,
@@ -109,8 +127,14 @@ function createServer(options = {}) {
       }
       if (req.method === "POST" && url.pathname === "/api/verify") {
         if (!requireCsrf(req, res, session)) return;
+        if (!String(req.headers["content-type"] || "").toLowerCase().startsWith("application/json")) {
+          return writeJson(res, 415, { error: "unsupported_media_type", message: "Use application/json for verification requests." });
+        }
         const payload = await readJson(req);
-        const result = verifyArticle({ article: payload.article || {}, corpus, registry });
+        const article = payload.article || {};
+        const validation = validateArticle(article);
+        if (!validation.valid) return writeJson(res, 422, { error: "invalid_article", errors: validation.errors });
+        const result = verifyArticle({ article, corpus, registry });
         return writeJson(res, 200, { ok: true, result });
       }
       if (req.method === "GET") {

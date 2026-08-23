@@ -42,9 +42,13 @@ function scoreSourceCredentials(article, registry) {
     warnings.push("No named author/byline");
   }
 
-  if (sanitizeText(article.publishedAt, 80)) {
+  const publishedAt = sanitizeText(article.publishedAt, 80);
+  if (publishedAt && !Number.isNaN(Date.parse(publishedAt))) {
     score += 5;
     signals.push("Publication date supplied");
+  } else if (publishedAt) {
+    score -= 5;
+    warnings.push("Publication date is invalid");
   } else {
     score -= 8;
     warnings.push("No publication date");

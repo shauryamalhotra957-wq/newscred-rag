@@ -42,4 +42,6 @@ test("credentialed evidence-bearing article scores above risky story", () => {
   });
   assert.ok(result.score >= 64);
   assert.ok(result.credentials.score > 85);
+  assert.equal(result.evidenceSummary.retrieved, result.evidence.length);
+  assert.equal(result.evidenceSummary.supportedClaims, result.comparison.support.length);
 });

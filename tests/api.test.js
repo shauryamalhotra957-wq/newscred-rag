@@ -18,6 +18,68 @@ test("safeStaticPath blocks traversal", () => {
   assert.equal(safeStaticPath(publicDir, "/%zz"), null);
 });
 
+test("API returns a request ID and accepts safe caller IDs", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/health`, { headers: { "X-Request-Id": "client_trace_123" } });
+    assert.equal(response.headers.get("x-request-id"), "client_trace_123");
+    assert.equal(response.headers.get("cache-control"), "no-store");
+  } finally {
+    server.close();
+  }
+});
+
+test("health endpoint includes a non-negative uptime", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/health`);
+    const health = await response.json();
+    assert.equal(health.ok, true);
+    assert.ok(health.uptimeSeconds >= 0);
+  } finally {
+    server.close();
+  }
+});
+
+test("corpus endpoint supports a simple discovery query", async () => {
+  const server = createServer({ corpus: [{ id: "health", title: "Health guidance", source: "WHO", sourceUrl: "https://who.int", credibility: 99, topics: ["health"] }], registry: [], samples: [] });
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/corpus?q=health`);
+    assert.equal((await response.json()).documents.length, 1);
+  } finally {
+    server.close();
+  }
+});
+
+test("corpus endpoint bounds results using limit", async () => {
+  const corpus = ["one", "two"].map((id) => ({ id, title: id, source: "Test", sourceUrl: "https://example.test", credibility: 50, topics: [] }));
+  const server = createServer({ corpus, registry: [], samples: [] });
+  const port = await listen(server);
+  try {
+    const response = await fetch(`http://127.0.0.1:${port}/api/corpus?limit=1`);
+    assert.equal((await response.json()).documents.length, 1);
+  } finally {
+    server.close();
+  }
+});
+
+test("verify endpoint requires an explicit JSON content type", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  const base = `http://127.0.0.1:${port}`;
+  try {
+    const sessionResponse = await fetch(`${base}/api/session`);
+    const session = await sessionResponse.json();
+    const response = await fetch(`${base}/api/verify`, { method: "POST", headers: { Cookie: sessionResponse.headers.get("set-cookie"), "X-CSRF-Token": session.csrfToken }, body: "{}" });
+    assert.equal(response.status, 415);
+  } finally {
+    server.close();
+  }
+});
+
 test("API blocks missing CSRF and verifies with valid CSRF", async () => {
   const server = createServer();
   const port = await listen(server);
@@ -85,6 +147,44 @@ test("session endpoint tolerates malformed cookie encoding", async () => {
     const payload = await response.json();
     assert.ok(payload.csrfToken);
     assert.match(response.headers.get("set-cookie"), /newscred_session=/);
+  } finally {
+    server.close();
+  }
+});
+
+test("verify endpoint returns actionable validation errors", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  const base = `http://127.0.0.1:${port}`;
+  try {
+    const sessionResponse = await fetch(`${base}/api/session`);
+    const session = await sessionResponse.json();
+    const response = await fetch(`${base}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: sessionResponse.headers.get("set-cookie"), "X-CSRF-Token": session.csrfToken },
+      body: JSON.stringify({ article: { title: "", body: "" } })
+    });
+    assert.equal(response.status, 422);
+    assert.equal((await response.json()).error, "invalid_article");
+  } finally {
+    server.close();
+  }
+});
+
+test("verify endpoint rejects non-object JSON bodies", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  const base = `http://127.0.0.1:${port}`;
+  try {
+    const sessionResponse = await fetch(`${base}/api/session`);
+    const session = await sessionResponse.json();
+    const response = await fetch(`${base}/api/verify`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Cookie: sessionResponse.headers.get("set-cookie"), "X-CSRF-Token": session.csrfToken },
+      body: "[]"
+    });
+    assert.equal(response.status, 400);
+    assert.equal((await response.json()).error, "bad_request");
   } finally {
     server.close();
   }
