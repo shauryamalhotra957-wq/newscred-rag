@@ -1,5 +1,7 @@
 "use strict";
 
+const { randomUUID } = require("crypto");
+
 const { scoreSourceCredentials } = require("./credentials");
 const { retrieveEvidence } = require("./rag");
 const { extractClaims, sanitizeText } = require("./text");
@@ -88,7 +90,7 @@ function verifyArticle({ article, corpus, registry }) {
   const verdict = verdictFromScore(finalScore);
 
   return {
-    id: `check_${Date.now().toString(36)}`,
+    id: `check_${randomUUID()}`,
     article: cleanArticle,
     verdict,
     score: finalScore,
