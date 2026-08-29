@@ -78,6 +78,8 @@ function enforceRateLimit(req, res, limit = 90) {
   }
   bucket.count += 1;
   if (bucket.count > limit) {
+    const retryAfterSeconds = Math.max(1, Math.ceil((bucket.started + WINDOW_MS - now) / 1000));
+    res.setHeader("Retry-After", String(retryAfterSeconds));
     writeJson(res, 429, { error: "rate_limited", message: "Too many requests. Slow the feed." });
     return false;
   }
