@@ -75,6 +75,34 @@ test("API blocks missing CSRF and verifies with valid CSRF", async () => {
   }
 });
 
+test("API returns 413 for an oversized JSON body", async () => {
+  const server = createServer();
+  const port = await listen(server);
+  const base = `http://127.0.0.1:${port}`;
+  try {
+    const sessionResponse = await fetch(`${base}/api/session`);
+    const cookie = sessionResponse.headers.get("set-cookie");
+    const session = await sessionResponse.json();
+
+    const response = await fetch(`${base}/api/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "X-CSRF-Token": session.csrfToken,
+        Cookie: cookie
+      },
+      body: JSON.stringify({ article: { body: "x".repeat(96 * 1024) } })
+    });
+
+    assert.equal(response.status, 413);
+    const payload = await response.json();
+    assert.equal(payload.error, "bad_request");
+    assert.equal(payload.message, "request_too_large");
+  } finally {
+    server.close();
+  }
+});
+
 test("session endpoint tolerates malformed cookie encoding", async () => {
   const server = createServer();
   const port = await listen(server);
