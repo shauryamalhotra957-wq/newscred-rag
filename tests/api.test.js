@@ -160,6 +160,7 @@ test("cleanup removes rate-limit buckets after their window expires", () => {
     url: "/api/verify"
   };
   const response = {
+    setHeader() {},
     writeHead() {},
     end() {}
   };
@@ -167,4 +168,23 @@ test("cleanup removes rate-limit buckets after their window expires", () => {
   assert.equal(enforceRateLimit(request, response, 1), true);
   cleanup(Date.now() + 60_001);
   assert.equal(enforceRateLimit(request, response, 1), true);
+});
+
+test("rate limiting tells callers when to retry", () => {
+  const headers = {};
+  const request = {
+    socket: { remoteAddress: "203.0.113.74" },
+    url: "/api/verify"
+  };
+  const response = {
+    setHeader(name, value) {
+      headers[name] = value;
+    },
+    writeHead() {},
+    end() {}
+  };
+
+  assert.equal(enforceRateLimit(request, response, 1), true);
+  assert.equal(enforceRateLimit(request, response, 1), false);
+  assert.match(headers["Retry-After"], /^([1-9]|[1-5][0-9]|60)$/);
 });
