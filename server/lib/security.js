@@ -110,17 +110,30 @@ function readBody(req, maxBytes = 64 * 1024) {
   return new Promise((resolve, reject) => {
     const chunks = [];
     let total = 0;
+    let settled = false;
+    const fail = (error) => {
+      if (settled) return;
+      settled = true;
+      reject(error);
+    };
+
     req.on("data", (chunk) => {
+      if (settled) return;
       total += chunk.length;
       if (total > maxBytes) {
-        reject(Object.assign(new Error("request_too_large"), { status: 413 }));
-        req.destroy();
+        fail(Object.assign(new Error("request_too_large"), { status: 413 }));
+        req.resume();
         return;
       }
       chunks.push(chunk);
     });
-    req.on("end", () => resolve(Buffer.concat(chunks)));
-    req.on("error", reject);
+    req.on("end", () => {
+      if (!settled) {
+        settled = true;
+        resolve(Buffer.concat(chunks));
+      }
+    });
+    req.on("error", fail);
   });
 }
 
