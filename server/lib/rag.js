@@ -26,6 +26,7 @@ function evidenceText(doc) {
 }
 
 function retrieveEvidence({ query, claims = [], corpus, topK = 5 }) {
+  const safeTopK = Number.isSafeInteger(topK) ? Math.max(1, Math.min(20, topK)) : 5;
   const queryTokens = tokenize([query, ...claims].join(" "));
   return corpus
     .map((doc) => {
@@ -40,7 +41,7 @@ function retrieveEvidence({ query, claims = [], corpus, topK = 5 }) {
       };
     })
     .sort((a, b) => b.score - a.score)
-    .slice(0, topK);
+    .slice(0, safeTopK);
 }
 
 module.exports = {
