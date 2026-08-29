@@ -36,10 +36,12 @@ function compareEvidence(claims, evidence) {
     const claimLower = claim.toLowerCase();
     const matching = evidence.filter((doc) => {
       const haystack = [doc.title, doc.summary, ...(doc.claims || []), ...(doc.topics || [])].join(" ").toLowerCase();
-      return claimLower
+      const words = claimLower
         .split(/\s+/)
-        .filter((word) => word.length > 4)
-        .some((word) => haystack.includes(word));
+        .filter((word) => word.length > 4);
+      const overlap = words.filter((word) => haystack.includes(word)).length;
+      const minimumOverlap = words.length <= 2 ? 1 : Math.min(3, Math.ceil(words.length * 0.25));
+      return overlap >= minimumOverlap;
     });
     if (matching.length) {
       support.push({ claim, evidenceIds: matching.slice(0, 3).map((doc) => doc.id) });
