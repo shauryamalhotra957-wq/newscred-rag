@@ -4,6 +4,7 @@ const test = require("node:test");
 const assert = require("node:assert/strict");
 const path = require("node:path");
 const { createServer, safeStaticPath } = require("../server");
+const { cleanup, enforceRateLimit } = require("../server/lib/security");
 
 function listen(server) {
   return new Promise((resolve) => {
@@ -123,4 +124,19 @@ test("live news endpoint normalizes feed stories and returns verifier output", a
   } finally {
     server.close();
   }
+});
+
+test("cleanup removes rate-limit buckets after their window expires", () => {
+  const request = {
+    socket: { remoteAddress: "203.0.113.73" },
+    url: "/api/verify"
+  };
+  const response = {
+    writeHead() {},
+    end() {}
+  };
+
+  assert.equal(enforceRateLimit(request, response, 1), true);
+  cleanup(Date.now() + 60_001);
+  assert.equal(enforceRateLimit(request, response, 1), true);
 });
