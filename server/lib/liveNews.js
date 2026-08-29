@@ -89,15 +89,24 @@ function stripTags(value) {
 
 function tagValue(block, tagName) {
   const escaped = tagName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-  const match = block.match(new RegExp(`<${escaped}(?:\\s[^>]*)?>([\\s\\S]*?)<\\/${escaped}>`, "i"));
+  const match = block.match(new RegExp("<" + escaped + "(?:\\s[^>]*)?>([\\s\\S]*?)<\\/" + escaped + ">", "i"));
   return match ? stripTags(match[1]) : "";
+}
+
+function safeArticleUrl(value) {
+  try {
+    const url = new URL(decodeEntities(value).trim());
+    return url.protocol === "https:" || url.protocol === "http:" ? url.href : "";
+  } catch {
+    return "";
+  }
 }
 
 function linkValue(block) {
   const textLink = tagValue(block, "link");
-  if (textLink) return textLink;
+  if (textLink) return safeArticleUrl(textLink);
   const atomLink = block.match(/<link\b[^>]*href=["']([^"']+)["'][^>]*>/i);
-  return atomLink ? decodeEntities(atomLink[1]).trim() : "";
+  return atomLink ? safeArticleUrl(atomLink[1]) : "";
 }
 
 function parseFeed(xml, feed) {
@@ -111,7 +120,7 @@ function parseFeed(xml, feed) {
       const author = tagValue(block, "dc:creator") || tagValue(block, "author") || feed.name;
       if (!title || !link) return null;
       return {
-        id: `${feed.id}-${index}`,
+        id: feed.id + "-" + index,
         source: feed.name,
         region: feed.region,
         title,
@@ -136,7 +145,7 @@ async function defaultFetchText(url, timeoutMs = DEFAULT_TIMEOUT_MS) {
         Accept: "application/rss+xml, application/xml, text/xml;q=0.9, */*;q=0.8"
       }
     });
-    if (!response.ok) throw new Error(`feed_http_${response.status}`);
+    if (!response.ok) throw new Error("feed_http_" + response.status);
     return response.text();
   } finally {
     clearTimeout(timeout);
