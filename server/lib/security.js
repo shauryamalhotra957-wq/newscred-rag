@@ -129,10 +129,15 @@ function writeJson(res, status, payload) {
   res.end(JSON.stringify(payload));
 }
 
-function cleanup() {
-  const cutoff = Date.now() - 2 * 60 * 60 * 1000;
+function cleanup(now = Date.now()) {
+  const sessionCutoff = now - 2 * 60 * 60 * 1000;
   for (const [id, session] of sessions.entries()) {
-    if (session.lastSeen < cutoff) sessions.delete(id);
+    if (session.lastSeen < sessionCutoff) sessions.delete(id);
+  }
+
+  const bucketCutoff = now - WINDOW_MS;
+  for (const [key, bucket] of buckets.entries()) {
+    if (bucket.started < bucketCutoff) buckets.delete(key);
   }
 }
 
