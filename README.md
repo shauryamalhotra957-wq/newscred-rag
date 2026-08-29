@@ -146,3 +146,6 @@ This project is currently marked `UNLICENSED` in `package.json`. Add a license b
 
 The credibility workspace follows the [NewsCred design system](design-system/newscred-rag/MASTER.md), using editorial hierarchy, trust-oriented color, readable evidence surfaces, keyboard focus, and responsive navigation.
 
+## Verification safeguards
+
+Verification IDs use UUIDs to avoid collisions under concurrent checks. Claim support requires meaningful multi-token overlap for longer claims, reducing one-word false positives; retrieval result counts are bounded before ranking. Regression tests cover these verifier and retrieval boundaries.
