@@ -1,6 +1,6 @@
-﻿import { describe, it } from "node:test";
-import assert from "node:assert/strict";
-import { SensationalismDetector } from "../server/lib/sensationalismDetector.js";
+﻿const { describe, it } = require("node:test");
+const assert = require("node:assert/strict");
+const { SensationalismDetector } = require("../server/lib/sensationalismDetector.js");
 
 describe("SensationalismDetector", () => {
   it("flags clickbait patterns and exclamation marks", () => {

@@ -5,6 +5,7 @@ const { randomUUID } = require("crypto");
 const { scoreSourceCredentials } = require("./credentials");
 const { retrieveEvidence } = require("./rag");
 const { extractClaims, sanitizeText } = require("./text");
+const { SensationalismDetector } = require("./sensationalismDetector");
 
 function riskSignals(article, claims) {
   const text = sanitizeText([article.title, article.body].join(" "), 12000).toLowerCase();
@@ -77,13 +78,14 @@ function verifyArticle({ article, corpus, registry }) {
   });
   const comparison = compareEvidence(claims, evidence);
   const risks = riskSignals(cleanArticle, claims);
+  const sensationalism = SensationalismDetector.analyze([cleanArticle.title, cleanArticle.body].join(" "));
 
   const evidenceScore = evidence.length
     ? Math.round(evidence.reduce((sum, doc) => sum + doc.score, 0) / evidence.length)
     : 0;
   const supportRatio = claims.length ? comparison.support.length / claims.length : 0;
   const gapPenalty = comparison.gaps.length * 5;
-  const riskPenalty = risks.warnings.length * 4;
+  const riskPenalty = risks.warnings.length * 4 + (sensationalism.level === "HIGH" ? 10 : sensationalism.level === "MEDIUM" ? 5 : 0);
   const strengthBonus = risks.strengths.length * 3;
   const finalScore = Math.max(
     0,
@@ -97,6 +99,7 @@ function verifyArticle({ article, corpus, registry }) {
     verdict,
     score: finalScore,
     credentials: credential,
+    sensationalism,
     claims,
     evidence: evidence.map((doc) => ({
       id: doc.id,

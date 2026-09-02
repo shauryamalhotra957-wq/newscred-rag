@@ -1,7 +1,4 @@
-﻿/**
- * Sensationalism & Clickbait Risk Detector
- * Detects sensationalist linguistic patterns, unverified absolutes, and headline escalation markers.
- */
+﻿"use strict";
 
 const SENSATIONAL_PHRASES = [
   "shocking truth",
@@ -27,7 +24,7 @@ const ABSOLUTE_QUALIFIERS = [
   "toxic",
 ];
 
-export class SensationalismDetector {
+class SensationalismDetector {
   static analyze(text) {
     if (!text || typeof text !== "string") {
       return { score: 0, flags: [], level: "LOW" };
@@ -37,7 +34,6 @@ export class SensationalismDetector {
     const flags = [];
     let riskPoints = 0;
 
-    // 1. Sensational phrase matches
     for (const phrase of SENSATIONAL_PHRASES) {
       if (lower.includes(phrase)) {
         flags.push(`Sensationalist phrase: "${phrase}"`);
@@ -45,7 +41,6 @@ export class SensationalismDetector {
       }
     }
 
-    // 2. Absolute / hyperbole terms
     const tokens = lower.split(/\s+/);
     let absoluteCount = 0;
     for (const tok of tokens) {
@@ -59,13 +54,11 @@ export class SensationalismDetector {
       riskPoints += Math.min(0.3, absoluteCount * 0.1);
     }
 
-    // 3. Excessive punctuation (!!!, ???, !?)
     if (/[!?]{2,}/.test(text)) {
       flags.push("Excessive punctuation markers");
       riskPoints += 0.2;
     }
 
-    // 4. Excessive uppercase words (>3 characters)
     const words = text.split(/\s+/);
     const upperWords = words.filter((w) => w.length > 3 && w === w.toUpperCase() && /^[A-Z]+$/.test(w));
     if (upperWords.length >= 2) {
@@ -83,3 +76,7 @@ export class SensationalismDetector {
     };
   }
 }
+
+module.exports = {
+  SensationalismDetector,
+};
