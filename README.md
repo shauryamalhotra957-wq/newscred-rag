@@ -1,5 +1,8 @@
 # NewsCred RAG
 
+[![CI](https://github.com/shauryamalhotra957-wq/newscred-rag/actions/workflows/ci.yml/badge.svg)](https://github.com/shauryamalhotra957-wq/newscred-rag/actions) [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+
 NewsCred RAG is a working prototype for news verification. It checks source credentials, extracts checkable claims, retrieves relevant evidence, compares claims against that evidence, and returns an explainable verdict.
 
 ![NewsCred RAG verification newsroom](public/assets/verification-newsroom.png)
