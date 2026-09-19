@@ -143,7 +143,7 @@ newscred-rag/
 
 ## License
 
-This project is currently marked `UNLICENSED` in `package.json`. Add a license before accepting external contributions or reuse.
+This project is licensed under the [MIT License](LICENSE).
 
 ## Experience Design
 
