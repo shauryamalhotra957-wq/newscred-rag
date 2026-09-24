@@ -1,71 +1,74 @@
-# Architecture
+# newscred-rag: Architecture & System Topology
+
+**Domain**: News Credibility Verification & Source Credential Scoring Engine  
+**Description**: Retrieval-augmented verification engine assessing journalistic reputation, cross-referencing claims against primary sources, and detecting cognitive bias.
+
+## 1. System Topology & Data Pipeline
 
 ```mermaid
 flowchart TD
-  UI[Browser UI] --> Session[GET /api/session]
-  UI --> Verify[POST /api/verify]
-  Verify --> Sanitize[Sanitize article]
-  Sanitize --> Claims[Claim extractor]
-  Sanitize --> Credentials[Source credential scorer]
-  Claims --> RAG[RAG retriever]
-  Evidence[(Evidence corpus)] --> RAG
-  Registry[(Source registry)] --> Credentials
-  RAG --> Verdict[Verdict engine]
-  Credentials --> Verdict
-  Verdict --> UI
+    subgraph Input["Evidence & Query Ingestion"]
+        SourceA["Decision Queries & Context"]
+        SourceB["Primary Evidence Corpus / Telemetry"]
+        Validator["Input Sanitizer & Boundary Guard"]
+    end
+
+    subgraph CoreEngine["Core Computational Fabric"]
+        DAG["Causal Inference & Graph Engine"]
+        SimulationEngine["Monte Carlo World Simulator (10k Paths)"]
+        ContradictionScanner["Adversarial Inconsistency Detector"]
+        Ledger["Provenance & Cryptographic Audit Ledger"]
+    end
+
+    subgraph Output["Decision Artifacts & UI"]
+        Dashboard["Decision Workspace / Viz"]
+        AuditReport["Certified Audit Manifest (JSON/PDF)"]
+    end
+
+    SourceA --> Validator
+    SourceB --> Validator
+    Validator --> DAG
+    DAG --> SimulationEngine
+    SimulationEngine --> ContradictionScanner
+    ContradictionScanner --> Ledger
+    Ledger --> Dashboard
+    Ledger --> AuditReport
 ```
 
-## Modules
+## 2. Decision Processing Sequence
 
-- `server/index.js`: HTTP server and API routes.
-- `server/lib/text.js`: sanitization, tokenization, domain parsing, and claim extraction.
-- `server/lib/credentials.js`: source registry matching and credential scoring.
-- `server/lib/rag.js`: evidence retrieval.
-- `server/lib/verifier.js`: scoring and verdict assembly.
-- `server/lib/security.js`: headers, CSRF, sessions, rate limits, body limits.
+```mermaid
+sequenceDiagram
+    autonumber
+    participant Client as Decision Orchestrator
+    participant Engine as newscred-rag Core
+    participant Sim as Simulation Engine
+    participant Ledger as Provenance Ledger
 
-## API
-
-### `GET /api/session`
-
-Returns a CSRF token.
-
-### `GET /api/samples`
-
-Returns demo credible and risky stories.
-
-### `GET /api/corpus`
-
-Returns evidence and source registry summaries.
-
-### `POST /api/verify`
-
-Request:
-
-```json
-{
-  "article": {
-    "title": "Story headline",
-    "sourceUrl": "https://example.com/story",
-    "author": "Reporter",
-    "publishedAt": "2026-07-02",
-    "body": "Article text..."
-  }
-}
+    Client->>Engine: Submit Decision Hypothesis & Constraints
+    Engine->>Engine: Parse Hypothesis into Causal Graph Nodes
+    Engine->>Sim: Launch Distributed Scenario Simulations
+    Sim-->>Engine: Return 10,000 Branch Distributions & Variances
+    Engine->>Engine: Compute Sensitivity Thresholds & Contradiction Risk
+    Engine->>Ledger: Commit Cryptographic Audit Record
+    Ledger-->>Engine: Block Verified (#48291)
+    Engine-->>Client: Return Synthesized Decision Artifact & Confidence Bounds
 ```
 
-Response:
+## 3. Decision Lifecycle & State Transitions
 
-```json
-{
-  "ok": true,
-  "result": {
-    "score": 58,
-    "verdict": { "label": "Unverified", "tone": "caution" },
-    "credentials": {},
-    "claims": [],
-    "evidence": [],
-    "warnings": []
-  }
-}
+```mermaid
+stateDiagram-v2
+    [*] --> Ingested: Submission
+    Ingested --> Validated: Bounds Passed
+    Validated --> Simulating: Launch Monte Carlo Matrix
+    Simulating --> ContradictionCheck: Variance Evaluated
+    ContradictionCheck --> Finalized: No Critical Flaws
+    ContradictionCheck --> ReviewRequired: High Premise Sensitivity
+    ReviewRequired --> Finalized: Operator Sign-off
+    Finalized --> [*]
 ```
+
+## 4. Architectural Guarantees
+- **Deterministic Replayability**: Given identical seeds and evidence snapshots, simulation outcomes match identically.
+- **Audit Immutability**: All evidence citations and score mutations are signed and logged to the internal provenance ledger.
